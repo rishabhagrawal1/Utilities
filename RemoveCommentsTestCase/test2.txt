@@ -1,0 +1,25 @@
+Test Input:
+
+
+// comment
+/* 
+* Comment
+*/
+// /**/ Comment /*/*//
+Not a comment
+/Not a comment.
+/**/ Not Comment 1 /*  */ Not Comment 2
+"Quotes"
+"//Still Quote /*Still one more quote*/"
+printf("hi // it is still a quote ");
+
+
+Test Output:
+
+
+Not a comment
+/Not a comment.
+ Not Comment 1  Not Comment 2
+"Quotes"
+"//Still Quote /*Still one more quote*/"
+printf("hi // it is still a quote ");

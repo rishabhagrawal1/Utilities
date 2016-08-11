@@ -1,0 +1,28 @@
+Test Input:
+
+#include<iostream>
+using namespace std;
+int main()
+{
+    /*int s = 12;*/
+    /* s = 13;
+    * 
+    */int s = 1; // s = 2;
+    s = 3; /*
+    // s = 4;*/ s = 4;
+    cout << s;
+    return 0;
+};
+
+Test Output:
+
+#include<iostream>
+using namespace std;
+int main()
+{
+    int s = 1; 
+    s = 3; 
+     s /= 4;
+    cout << s;
+    return 0;
+};

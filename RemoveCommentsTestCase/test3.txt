@@ -1,0 +1,240 @@
+Input:
+
+#include<iostream>
+#include <string>
+using namespace std;
+#define keepIndent
+
+struct Params{
+    bool spanStart;  //to keep track of multiline comments
+    bool quotesStart; //to keep track of string in print statement
+    Params() : spanStart(false), quotesStart(false) {}
+};
+
+/*
+* Function to check the line character by character and tracking the comments
+*/
+void printChar(bool& containChar, string& spaces, 
+                        string& line, int index)
+{
+#ifdef keepIndent
+    if(!containChar)
+    {
+        cout << spaces;
+    }
+#endif
+    containChar = true;
+    cout << line[index];
+}
+
+bool checkLine(string &line, Params& params)
+{
+    int index = 0;
+    int size = line.size();
+	//to keep track of character printed apart from spaces
+    bool containChar = false;
+    
+    //To keep the indentetion correct in case of multi- 
+    //line comment ending in middle of line 
+#ifdef keepIndent
+    string spaces;
+    while(index < size-1 && line[index] == ' ')
+    {
+        spaces += ' ';
+        index++;
+    }
+#endif
+ //check till size-2, last character need to be print separately
+    //cout << line <<endl;
+    while(index < size-1)
+    {
+        if(params.quotesStart || !params.spanStart && line[index] != '/')
+        {
+            printChar(containChar, spaces, line, index);        
+        }
+        
+        switch(line[index])
+        {
+            case '/':
+            {
+                //cout << params.quotesStart << params.spanStart;
+                if(!params.quotesStart && !params.spanStart){
+                    if(line[index + 1] == '/')
+                        return containChar;
+                    else if(line[index + 1] == '*'){
+                        params.spanStart = true;
+                        index++;
+                    }
+                    else{
+                        printChar(containChar, spaces, line, index);
+                    }
+                }
+                break;    
+            }
+            case '*':
+            {
+                if(params.spanStart && line[index+1] == '/'){
+                    params.spanStart = false;
+                    index++;
+                }
+                break;
+            }
+            case '"':
+            {
+                if(!params.spanStart)
+                    params.quotesStart = !params.quotesStart;
+                break;
+            }
+            case '\'':
+            {
+                if(!params.spanStart && !params.quotesStart){
+                    if(line[index+1] == '"'){
+                        cout << line[index+1];
+                        index++;
+                    }
+                }
+                break;
+            }
+        }
+        index++;
+    }
+	//print last remaining charater with indentention preserved 
+	//if it is not just a space
+    if(!params.spanStart && index < size && line[index] != ' ')
+    {
+        if(!params.spanStart && line[index] == '"')
+            params.quotesStart = !params.quotesStart;
+        printChar(containChar, spaces, line, index);
+    }
+    return containChar;
+}
+
+int main() 
+{
+    string line;
+    Params params;
+    //keep track of multiline commnets
+	//bool spanStart;
+    bool result = false;
+	//get lines one by one
+    while (getline(cin, line)) 
+    {
+        result = checkLine(line, params);
+        //only add new line if any character apart from //space was printed for this line.
+		if(result == true)
+            cout << endl;
+    }
+    return 0;
+}
+
+Output:
+
+#include<iostream>
+#include <string>
+using namespace std;
+#define keepIndent
+struct Params{
+    bool spanStart;  
+    bool quotesStart; 
+    Params() : spanStart(false), quotesStart(false) {}
+};
+void printChar(bool& containChar, string& spaces,
+                        string& line, int index)
+{
+#ifdef keepIndent
+    if(!containChar)
+    {
+        cout << spaces;
+    }
+#endif
+    containChar = true;
+    cout << line[index];
+}
+bool checkLine(string &line, Params& params)
+{
+    int index = 0;
+    int size = line.size();
+	
+    bool containChar = false;
+#ifdef keepIndent
+    string spaces;
+    while(index < size-1 && line[index] == ' ')
+    {
+        spaces += ' ';
+        index++;
+    }
+#endif
+    while(index < size-1)
+    {
+        if(params.quotesStart || !params.spanStart && line[index] != '/')
+        {
+            printChar(containChar, spaces, line, index);       
+        }
+        switch(line[index])
+        {
+            case '/':
+            {
+                if(!params.quotesStart && !params.spanStart){
+                    if(line[index + 1] == '/')
+                        return containChar;
+                    else if(line[index + 1] == '*'){
+                        params.spanStart = true;
+                        index++;
+                    }
+                    else{
+                        printChar(containChar, spaces, line, index);
+                    }
+                }
+                break;   
+            }
+            case '*':
+            {
+                if(params.spanStart && line[index+1] == '/'){
+                    params.spanStart = false;
+                    index++;
+                }
+                break;
+            }
+            case '"':
+            {
+                if(!params.spanStart)
+                    params.quotesStart = !params.quotesStart;
+                break;
+            }
+            case '\'':
+            {
+                if(!params.spanStart && !params.quotesStart){
+                    if(line[index+1] == '"'){
+                        cout << line[index+1];
+                        index++;
+                    }
+                }
+                break;
+            }
+        }
+        index++;
+    }
+	
+    if(!params.spanStart && index < size && line[index] != ' ')
+    {
+        if(!params.spanStart && line[index] == '"')
+            params.quotesStart = !params.quotesStart;
+        printChar(containChar, spaces, line, index);
+    }
+    return containChar;
+}
+int main()
+{
+    string line;
+    Params params;
+	
+    bool result = false;
+	
+    while (getline(cin, line))
+    {
+        result = checkLine(line, params);
+		if(result == true)
+            cout << endl;
+    }
+    return 0;
+}
