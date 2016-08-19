@@ -20,12 +20,12 @@ double Log2( double n )
 void addBitCheckAndFlush(unsigned char *co, char bit, int *nCurrBits, FILE* fpo)
 {
     *co = (((*co) << 1)) | bit;
-	(*nCurrBits)++;
-	if(*nCurrBits == BYTE_SIZE)
-	{   
-	    fputc(*co, fpo);
-	    *nCurrBits = 0;
-         *co = 0;
+    (*nCurrBits)++;
+    if(*nCurrBits == BYTE_SIZE)
+    {   
+	fputc(*co, fpo);
+	*nCurrBits = 0;
+        *co = 0;
     }    
 }
 
@@ -33,7 +33,7 @@ void gammaEncode(int count, char *co, int* nCurrBits, FILE *fpo, char current)
 {
     int numZeros;
     //chain found with more then one length
-	//Need to encode the chain length before writing to file
+    //Need to encode the chain length before writing to file
     if(count > 1)
     {
         //Add the binary representation of number
@@ -47,12 +47,12 @@ void gammaEncode(int count, char *co, int* nCurrBits, FILE *fpo, char current)
             addBitCheckAndFlush(co, ((count & i) > 0), nCurrBits, fpo);
         }
     }
-	else
-	{
-		//Single bit either flush if byte has been completed 
-		//else append in the result byte
-		addBitCheckAndFlush(co, 1, nCurrBits, fpo);
-	}
+    else
+    {
+	//Single bit either flush if byte has been completed 
+	//else append in the result byte
+	addBitCheckAndFlush(co, 1, nCurrBits, fpo);
+    }
 }
 
 int runLengthEncode(FILE *fpi, FILE *fpo)
@@ -60,9 +60,9 @@ int runLengthEncode(FILE *fpi, FILE *fpo)
     char ci, co = 0;
     char current = -1;
     int count = 0;
-	int nCurrBits = 0;
-	long gammaEncoding;
-	//till characters are there in file
+    int nCurrBits = 0;
+    long gammaEncoding;
+    //till characters are there in file
     while(fread(&ci, sizeof(char), 1, fpi) != 0) 
     {
         //first bit 0 or 1
@@ -81,8 +81,8 @@ int runLengthEncode(FILE *fpi, FILE *fpo)
             //bit changed
             else
             {
-				gammaEncode(count, &co, &nCurrBits, fpo, current);
-				current = !current;
+	        gammaEncode(count, &co, &nCurrBits, fpo, current);
+		current = !current;
                 count = 1;
             }    
         }
@@ -94,7 +94,7 @@ int runLengthEncode(FILE *fpi, FILE *fpo)
     {
         fputc(co << (BYTE_SIZE - nCurrBits), fpo);
     }
-	return 0;
+    return 0;
 }
 
 int runLengthDecode(FILE *fpi, FILE *fpo)
@@ -121,17 +121,17 @@ int runLengthDecode(FILE *fpi, FILE *fpo)
         {
             currBit = (ci & (1 << i))? 1: 0;
             //Check till first one
-			if(!zeroOver)
-			{   
-			    if(currBit == 1)
-			    {
-			        num |= currBit;
-			        zeroOver = 1;    
-			    }
-			    else   
+	    if(!zeroOver)
+	    {   
+	        if(currBit == 1)
+	        {
+	            num |= currBit;
+	            zeroOver = 1;    
+	        }
+	        else   
                     countZeros++;
-			}
-			//check till number of zeros count after first one
+	    }
+	    //check till number of zeros count after first one
             else if(countZeros > 0 && zeroOver){
                 num = ((num << 1) | currBit);
                 countZeros--;
@@ -151,7 +151,7 @@ int runLengthDecode(FILE *fpi, FILE *fpo)
     {
         fputc(co << (BYTE_SIZE - nCurrBits), fpo);
     }
-	return 0;
+    return 0;
 }
 
 int runLengthUtility(FILE *fpi, FILE *fpo, opCode operation)
